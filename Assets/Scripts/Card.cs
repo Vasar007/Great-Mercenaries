@@ -29,11 +29,11 @@ public class Card : MonoBehaviour
         }
     }
 
-    public void ReceiveDamege(int receivedDamage)
+    public void ReceiveDamage(int receivedDamage)
     {
         if (IsAlive())
         {
-            healthPoints -= damage;
+            healthPoints -= receivedDamage;
 
             if (healthPoints <= 0)
             {

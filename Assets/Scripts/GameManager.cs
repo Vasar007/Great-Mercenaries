@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     private int _numberOfMadeSteps;
     private int _wonsRaunds;
+    private BattleManager.BattleResult _fightResult;
+    private bool _processingFight;
+    private bool _fightEnded;
 
 
     private void Start()
@@ -36,7 +39,36 @@ public class GameManager : MonoBehaviour
     
     private void Update()
     {
-        //if (LoadingManager.CurrentAppState == LoadingManager.AppState.Loading) return;
+        if (LoadingManager.currentAppState == LoadingManager.AppState.Loading) return;
+
+        if (_processingFight)
+        {
+            _fightResult = battleManager.MakeBattle(isPlayerTurn);
+
+            if (_fightResult != 0)
+            {
+                _processingFight = false;
+                _fightEnded = true;
+            }
+        }
+
+        if (_fightEnded)
+        {
+            _fightEnded = false;
+            Debug.Log((_fightResult == BattleManager.BattleResult.PlayerWon ? "Player" : "Bot") + " won round!");
+            _wonsRaunds += _fightResult == BattleManager.BattleResult.PlayerWon ? 1 : 0;
+
+            battleManager.DestroyCards();
+            ++raundNumber;
+            currentGameState = GameState.IsPlaying;
+
+            if (raundNumber > raundsLimit)
+            {
+                // If number of rounds greater than raunds limit game is over.
+                currentGameState = GameState.GameOver;
+                Debug.Log("Game over!");
+            }
+        }
     }
 
     public void MakeStep()
@@ -56,20 +88,7 @@ public class GameManager : MonoBehaviour
         if (raundNumber <= raundsLimit)
         {
             currentGameState = GameState.ActionBattle;
-            bool result = battleManager.MakeBattle(isPlayerTurn);
-            Debug.Log((result ? "Player" : "Bot") + " won round!");
-            _wonsRaunds += result ? 1 : 0;
-
-            battleManager.DestroyCards();
-            ++raundNumber;
-            currentGameState = GameState.IsPlaying;
-        }
-
-        if (raundNumber > raundsLimit)
-        {
-            // If number of rounds greater than raunds limit game is over.
-            currentGameState = GameState.GameOver;
-            Debug.Log("Game over!");
+            _processingFight = true;
         }
     }
 

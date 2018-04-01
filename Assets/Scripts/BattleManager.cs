@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
+    public enum BattleResult
+    {
+        NotEnd,
+        PlayerWon,
+        EnemyWon
+    }
+
     public GameObject playerCard;
     public GameObject enemyCard;
 
@@ -28,6 +36,7 @@ public class BattleManager : MonoBehaviour
         {
             _needToDelay = true;
 
+            Thread.Sleep(1000);
             Destroy(playerCard);
             Destroy(enemyCard);
         }
@@ -45,7 +54,7 @@ public class BattleManager : MonoBehaviour
         _needToDelay = false;
     }
 
-    public bool MakeBattle(bool isPlayerStep)
+    public BattleResult MakeBattle(bool isPlayerStep)
     {
         if (!_isNeedToFight)
         {
@@ -59,19 +68,26 @@ public class BattleManager : MonoBehaviour
         return isPlayerStep ? ProcessFight(player, enemy) : ProcessFight(enemy, player);
     }
 
-    private bool ProcessFight(Card card1, Card card2)
+    // 0 = fight is not end
+    // 1 = player won
+    // 2 = bot won
+    private BattleResult ProcessFight(Card card1, Card card2)
     {
-        while (card1.IsAlive() && card2.IsAlive())
+        if (card1.IsAlive())
         {
-            card2.ReceiveDamege(card1.damage);
-            card1.ReceiveDamege(card2.damage);
+            card2.ReceiveDamage(card1.damage);
+            if (card2.IsAlive())
+            {
+                card1.ReceiveDamage(card2.damage);
+            }
 
+            Thread.Sleep(500);
             Debug.Log("In action: " + card1.healthPoints + " vs. " + card2.healthPoints);
         }
 
-        _isNeedToFight = false;
-
-        return card1.IsAlive();
+        _isNeedToFight = card1.IsAlive() && card2.IsAlive();
+        return _isNeedToFight ? BattleResult.NotEnd
+                              : card1.IsAlive() ? BattleResult.PlayerWon : BattleResult.EnemyWon;
     }
 
     public void SetCardForBattle(GameObject card, bool isPlayer)
