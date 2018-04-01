@@ -35,6 +35,6 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# User defined part
+# User-defined section
 *.dll
 *.exe
