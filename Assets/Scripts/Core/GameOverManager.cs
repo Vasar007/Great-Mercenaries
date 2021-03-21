@@ -58,7 +58,8 @@ public class GameOverManager : MonoBehaviour
             {
                 // Then exit to main menu.
                 UnityEngine.SceneManagement.SceneManager.LoadScene(
-                    PlayerPrefs.GetString("LastScene"));
+                    PlayerPrefs.GetString("LastScene")
+                );
             }
         }
     }

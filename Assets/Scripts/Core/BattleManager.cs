@@ -68,9 +68,6 @@ public class BattleManager : MonoBehaviour
         return isPlayerStep ? ProcessFight(player, enemy) : ProcessFight(enemy, player);
     }
 
-    // 0 = fight is not end
-    // 1 = player won
-    // 2 = bot won
     private BattleResult ProcessFight(Card card1, Card card2)
     {
         if (card1.IsAlive())
