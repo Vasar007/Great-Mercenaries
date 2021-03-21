@@ -35,6 +35,7 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# User-defined section
+# User-defined block
 *.dll
 *.exe
+.ionide/
