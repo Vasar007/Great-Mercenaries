@@ -1,68 +1,73 @@
 ﻿using UnityEngine;
+using GreatMercenaries.Assets.Scripts.Core.Events;
+using GreatMercenaries.Assets.Scripts.UI;
 
-public class Card : MonoBehaviour
+namespace GreatMercenaries.Assets.Scripts.Core.Cards
 {
-    public int healthPoints;
-    public int damage;
-
-    [SerializeField]
-    private string _valueMessage;
-
-    private bool _hasAnyChages;
-
-
-    // Use this for initialization
-    private void Start()
+    public class Card : MonoBehaviour
     {
-        //ActionBroadcast();
-    }
+        public int healthPoints;
+        public int damage;
 
-    // Update is called once per frame
-    private void Update()
-    {
-        if (LoadingManager.currentAppState == LoadingManager.AppState.Loading) return;
+        [SerializeField]
+        private string _valueMessage;
 
-        if (_hasAnyChages)
+        private bool _hasAnyChages;
+
+
+        // Use this for initialization
+        private void Start()
         {
-            ActionBroadcast(_valueMessage);
-            _hasAnyChages = false;
+            //ActionBroadcast();
         }
-    }
 
-    public void ReceiveDamage(int receivedDamage)
-    {
-        if (IsAlive())
+        // Update is called once per frame
+        private void Update()
         {
-            healthPoints -= receivedDamage;
+            if (LoadingManager.currentAppState == LoadingManager.AppState.Loading) return;
 
-            if (healthPoints <= 0)
+            if (_hasAnyChages)
             {
-                healthPoints = 0;
+                ActionBroadcast(_valueMessage);
+                _hasAnyChages = false;
             }
-
-            _hasAnyChages = true;
         }
-    }
 
-    public bool IsAlive()
-    {
-        return healthPoints > 0;
-    }
+        public void ReceiveDamage(int receivedDamage)
+        {
+            if (IsAlive())
+            {
+                healthPoints -= receivedDamage;
 
-    public void ActionBroadcast(string message)
-    {
-        _valueMessage = message;
-        Messenger.Broadcast<MonoBehaviour, string>(_valueMessage, this,
-                                                   damage + "/" + healthPoints);
-    }
+                if (healthPoints <= 0)
+                {
+                    healthPoints = 0;
+                }
 
-    public void SetValueMessage(string message)
-    {
-        _valueMessage = message;
-    }
+                _hasAnyChages = true;
+            }
+        }
 
-    public string GetValueMessage()
-    {
-        return _valueMessage;
+        public bool IsAlive()
+        {
+            return healthPoints > 0;
+        }
+
+        public void ActionBroadcast(string message)
+        {
+            _valueMessage = message;
+            Messenger.Broadcast<MonoBehaviour, string>(_valueMessage, this,
+                                                       damage + "/" + healthPoints);
+        }
+
+        public void SetValueMessage(string message)
+        {
+            _valueMessage = message;
+        }
+
+        public string GetValueMessage()
+        {
+            return _valueMessage;
+        }
     }
 }

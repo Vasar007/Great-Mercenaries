@@ -1,78 +1,66 @@
-﻿//
-// SliderBinding.cs
-//
-// Author:
-//       p4p <p4p@bunkville.com>
-//
-// Copyright (c) 2015 p4p
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-#define LOG
+﻿#define LOG
 
 using UnityEngine;
 using UnityEngine.UI;
+using GreatMercenaries.Assets.Scripts.Core.Events;
 
-public class SliderBinding : MonoBehaviour
+namespace GreatMercenaries.Assets.Scripts.UI
 {
-    public string valueMessage;
-    public bool broadcasts = true;
-
-    private Slider _slider;
-
-
-    private void Awake()
+    public class SliderBinding : MonoBehaviour
     {
-        _slider = GetComponent<Slider>();
-        if (_slider == null) return;
+        public string valueMessage;
+        public bool broadcasts = true;
 
-        if (string.IsNullOrEmpty(valueMessage)) return;
+        private Slider _slider;
 
-        Messenger.AddListener<MonoBehaviour, float>(valueMessage, HandleSliderChangedMessage);
 
-        if (broadcasts)
+        private void Awake()
         {
-            _slider.onValueChanged.AddListener(onValueChanged);
+            _slider = GetComponent<Slider>();
+            if (_slider == null) return;
+
+            if (string.IsNullOrEmpty(valueMessage)) return;
+
+            Messenger.AddListener<MonoBehaviour, float>(valueMessage, HandleSliderChangedMessage);
+
+            if (broadcasts)
+            {
+                _slider.onValueChanged.AddListener(onValueChanged);
+            }
         }
-    }
 
-    private void OnDestroy()
-    {
-        if (string.IsNullOrEmpty(valueMessage)) return;
-
-        Messenger.RemoveListener<MonoBehaviour, float>(valueMessage, HandleSliderChangedMessage);
-
-        if (broadcasts)
+        private void OnDestroy()
         {
-            _slider.onValueChanged.RemoveListener(onValueChanged);
+            if (string.IsNullOrEmpty(valueMessage)) return;
+
+            Messenger.RemoveListener<MonoBehaviour, float>(valueMessage, HandleSliderChangedMessage);
+
+            if (broadcasts)
+            {
+                _slider.onValueChanged.RemoveListener(onValueChanged);
+            }
         }
-    }
 
-    private void HandleSliderChangedMessage(MonoBehaviour sender, float newValue)
-    {
-        if (sender == null || sender == this) return;
+        private void HandleSliderChangedMessage(MonoBehaviour sender, float newValue)
+        {
+            if (sender == null || sender == this) return;
 
-        #if LOG
+#if LOG
             Debug.Log(string.Format("Slider\t{0}\tHandleSliderChangedMessage Source:\t{1}\tValue:{2}",
                       gameObject.name, sender.GetInstanceID(), newValue));
-        #endif
+#endif
 
-        _slider.value = newValue;
-    }
+            _slider.value = newValue;
+        }
 
-    private void onValueChanged(float newValue)
-    {
-        #if LOG
+        private void onValueChanged(float newValue)
+        {
+#if LOG
             Debug.Log(string.Format("Slider\t{0}\tonValueChanged:\t{1}",
                       gameObject.name, newValue));
-        #endif
+#endif
 
-        Messenger.Broadcast<MonoBehaviour, float>(valueMessage, this, newValue);
+            Messenger.Broadcast<MonoBehaviour, float>(valueMessage, this, newValue);
+        }
     }
 }

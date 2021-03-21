@@ -2,77 +2,80 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameOverManager : MonoBehaviour
+namespace GreatMercenaries.Assets.Scripts.Core
 {
-    // Time to wait before exit the level.
-    public float exitDelay = 5.0f;
-
-    [SerializeField]
-    private GameManager _gameManager;
-
-    [SerializeField]
-    private string _gameOverTextTag = "GameOverText";
-
-    // Reference to the animator component.
-    private Animator _animator;
-    // Timer to count up to exit the level.
-    private float _exitTimer;
-
-    private bool _firstStep = true;
-    private bool _needToDelay = true;
-
-    private void Awake()
+    public class GameOverManager : MonoBehaviour
     {
-        // Set up the reference.
-        _animator = GetComponent<Animator>();
-    }
+        // Time to wait before exit the level.
+        public float exitDelay = 5.0f;
 
-    private void Update()
-    {
-        if (_gameManager.currentGameState != GameManager.GameState.GameOver) return;
+        [SerializeField]
+        private GameManager _gameManager;
 
-        // Additional delay to avoid quick first bot step if bot makes step first.
-        if (_firstStep)
+        [SerializeField]
+        private string _gameOverTextTag = "GameOverText";
+
+        // Reference to the animator component.
+        private Animator _animator;
+        // Timer to count up to exit the level.
+        private float _exitTimer;
+
+        private bool _firstStep = true;
+        private bool _needToDelay = true;
+
+        private void Awake()
         {
-            StartCoroutine(MakeDelay(0.5f));
-            _firstStep = false;
-            return;
+            // Set up the reference.
+            _animator = GetComponent<Animator>();
         }
 
-        if (_needToDelay) return;
-
-        if (_gameManager.currentGameState == GameManager.GameState.GameOver)
+        private void Update()
         {
-            // If game is over.
-            GameObject.FindGameObjectWithTag(_gameOverTextTag).GetComponent<Text>().text =
-                _gameManager.IsPlayerWon() ? "You won!" : "You lose!";
+            if (_gameManager.currentGameState != GameManager.GameState.GameOver) return;
 
-            // Tell the animator the game is over.
-            _animator.SetTrigger("GameOver");
-
-            // Increment a timer to count up to exit.
-            _exitTimer += Time.deltaTime;
-
-            // If it reaches the exit delay.
-            if (_exitTimer >= exitDelay)
+            // Additional delay to avoid quick first bot step if bot makes step first.
+            if (_firstStep)
             {
-                // Then exit to main menu.
-                UnityEngine.SceneManagement.SceneManager.LoadScene(
-                    PlayerPrefs.GetString("LastScene")
-                );
+                StartCoroutine(MakeDelay(0.5f));
+                _firstStep = false;
+                return;
+            }
+
+            if (_needToDelay) return;
+
+            if (_gameManager.currentGameState == GameManager.GameState.GameOver)
+            {
+                // If game is over.
+                GameObject.FindGameObjectWithTag(_gameOverTextTag).GetComponent<Text>().text =
+                    _gameManager.IsPlayerWon() ? "You won!" : "You lose!";
+
+                // Tell the animator the game is over.
+                _animator.SetTrigger("GameOver");
+
+                // Increment a timer to count up to exit.
+                _exitTimer += Time.deltaTime;
+
+                // If it reaches the exit delay.
+                if (_exitTimer >= exitDelay)
+                {
+                    // Then exit to main menu.
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(
+                        PlayerPrefs.GetString("LastScene")
+                    );
+                }
             }
         }
-    }
 
-    private IEnumerator MakeDelay(float timeDelay)
-    {
-        float time = 0.0f;
-        while (time < timeDelay)
+        private IEnumerator MakeDelay(float timeDelay)
         {
-            time += Time.deltaTime;
-            yield return null;
-        }
+            float time = 0.0f;
+            while (time < timeDelay)
+            {
+                time += Time.deltaTime;
+                yield return null;
+            }
 
-        _needToDelay = false;
+            _needToDelay = false;
+        }
     }
 }

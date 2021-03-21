@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 
-public class EscapeMenu : MonoBehaviour
+namespace GreatMercenaries.Assets.Scripts.UI
 {
-    private void Update()
+    public class EscapeMenu : MonoBehaviour
     {
-        if (LoadingManager.currentAppState == LoadingManager.AppState.Loading) return;
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        private void Update()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(PlayerPrefs.GetString("LastScene"));
+            if (LoadingManager.currentAppState == LoadingManager.AppState.Loading) return;
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(PlayerPrefs.GetString("LastScene"));
+            }
         }
     }
 }
